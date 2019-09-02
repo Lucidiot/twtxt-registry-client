@@ -7,6 +7,7 @@ from twtxt_registry_client import RegistryClient
 
 @click.group(name='twtxt-registry')
 @click.argument('registry_url', required=True)
+@click.version_option()
 @click.option('-k', '--insecure', is_flag=True)
 @click.pass_context
 def cli(ctx, registry_url, insecure):

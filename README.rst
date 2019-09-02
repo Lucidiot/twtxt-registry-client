@@ -18,4 +18,3 @@ To-do
 
 * Parsing, enhanced outputs and porcelain mode, just like with `twtxt`_
 * Verbose output and logging
-* Set user-agent depending on twtxt's ``disclose_identity``

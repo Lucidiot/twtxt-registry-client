@@ -1,13 +1,33 @@
 import urllib
 import requests
+from twtxt.config import Config
 
 
 class RegistryClient(object):
 
-    def __init__(self, registry_url, insecure=False):
+    def __init__(self, registry_url, insecure=False, disclose_identity=None):
         self.registry_url = registry_url
         self.session = requests.Session()
         self.session.verify = not insecure
+
+        from twtxt_registry_client import __version__
+        if disclose_identity or disclose_identity is None:
+            try:
+                config = Config.discover()
+            except ValueError:
+                disclose_identity = False
+            else:
+                disclose_identity = config.disclose_identity
+
+        if disclose_identity:
+            user_agent = 'twtxt-registry/{} (+{}; @{})'.format(
+                __version__,
+                config.twturl,
+                config.nick,
+            )
+        else:
+            user_agent = 'twtxt-registry/{}'.format(__version__)
+        self.session.headers['User-Agent'] = user_agent
 
     def request(self, method, endpoint, *, format='plain', **params):
         resp = method(
