@@ -17,5 +17,5 @@ To-do
 * Sphinx documentation
   * Doc8 linting
   * GitLab Pages
-* Enhanced outputs and porcelain mode, just like with `twtxt`_
+* Parsing, enhanced outputs and porcelain mode, just like with `twtxt`_
 * Verbose output and logging
