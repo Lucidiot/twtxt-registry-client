@@ -15,7 +15,9 @@ To-do
   ``twtxt-registry registry.twtxt.org mentions johndoe``
 * Command-line help
 * Sphinx documentation
+
   * Doc8 linting
   * GitLab Pages
+
 * Parsing, enhanced outputs and porcelain mode, just like with `twtxt`_
 * Verbose output and logging
