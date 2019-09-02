@@ -62,10 +62,22 @@ def tweets(ctx, query):
 
 
 @cli.command()
-@click.argument('url', required=False)
+@click.argument('name_or_url', required=False)
 @click.pass_context
-def mentions(ctx, url):
-    if not url:
+def mentions(ctx, name_or_url):
+    if name_or_url:
+        scheme = urlsplit(name_or_url).scheme
+        if not scheme:  # it could be a nick
+            try:
+                config = Config.discover()
+            except ValueError:
+                pass
+            else:
+                source = config.get_source_by_nick(name_or_url)
+                if source:
+                    url = source.url
+        url = url or name_or_url  # Fallback
+    else:
         try:
             config = Config.discover()
         except ValueError as e:
@@ -75,6 +87,7 @@ def mentions(ctx, url):
                 ctx=ctx,
             )
         url = config.twturl
+
     click.echo(ctx.obj.list_mentions(url).text)
 
 

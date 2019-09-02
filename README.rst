@@ -10,8 +10,6 @@ To-do
 -----
 
 * Error handling
-* Read user info from twtxt following list to guess the URL in mentions :
-  ``twtxt-registry registry.twtxt.org mentions johndoe``
 * Command-line help
 * Sphinx documentation
 
@@ -20,3 +18,4 @@ To-do
 
 * Parsing, enhanced outputs and porcelain mode, just like with `twtxt`_
 * Verbose output and logging
+* Set user-agent depending on twtxt's ``disclose_identity``
