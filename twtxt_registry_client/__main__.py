@@ -62,11 +62,19 @@ def tweets(ctx, query):
 
 
 @cli.command()
-@click.argument('url', required=True)
+@click.argument('url', required=False)
 @click.pass_context
 def mentions(ctx, url):
-    # TODO: Allow names instead of URLs for known users
-    # TODO: Use twtxt's config to default to the user's name
+    if not url:
+        try:
+            config = Config.discover()
+        except ValueError as e:
+            raise click.UsageError(
+                'URL was omitted from the command-line, but it could not '
+                'be deduced from the twtxt config: {!s}'.format(e),
+                ctx=ctx,
+            )
+        url = config.twturl
     click.echo(ctx.obj.list_mentions(url).text)
 
 
