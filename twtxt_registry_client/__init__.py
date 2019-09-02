@@ -1,0 +1,1 @@
+from twtxt_registry_client.client import RegistryClient
