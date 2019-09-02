@@ -4,8 +4,10 @@ import requests
 
 class RegistryClient(object):
 
-    def __init__(self, registry_url):
+    def __init__(self, registry_url, insecure=False):
         self.registry_url = registry_url
+        self.session = requests.Session()
+        self.session.verify = not insecure
 
     def request(self, method, endpoint, *, format='plain', **params):
         resp = method(
@@ -17,10 +19,10 @@ class RegistryClient(object):
         return resp
 
     def get(self, *args, **kwargs):
-        return self.request(requests.get, *args, **kwargs)
+        return self.request(self.session.get, *args, **kwargs)
 
     def post(self, *args, **kwargs):
-        return self.request(requests.post, *args, **kwargs)
+        return self.request(self.session.post, *args, **kwargs)
 
     def register(self, nickname, url, *, format='plain'):
         return self.post(

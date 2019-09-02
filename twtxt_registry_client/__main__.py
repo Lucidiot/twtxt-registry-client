@@ -6,15 +6,16 @@ from twtxt_registry_client import RegistryClient
 
 @click.group(name='twtxt-registry')
 @click.argument('registry_url', required=True)
+@click.option('-k', '--insecure', is_flag=True)
 @click.pass_context
-def cli(ctx, registry_url):
+def cli(ctx, registry_url, insecure):
     scheme, netloc, path, query, fragment = urlsplit(registry_url)
     if not scheme:
         scheme = 'https'
     if not netloc and path:
         netloc, _, path = path.partition('/')
     registry_url = urlunsplit((scheme, netloc, path, query, fragment))
-    ctx.obj = RegistryClient(registry_url)
+    ctx.obj = RegistryClient(registry_url, insecure=insecure)
 
 
 @cli.command()
