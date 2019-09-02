@@ -10,7 +10,6 @@ To-do
 -----
 
 * Error handling
-* Read user info from twtxt's config to set defaults on user registration
 * Read user info from twtxt following list to guess the URL in mentions :
   ``twtxt-registry registry.twtxt.org mentions johndoe``
 * Command-line help

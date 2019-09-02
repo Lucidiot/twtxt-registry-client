@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from urllib.parse import urlsplit, urlunsplit
 import click
+from twtxt.config import Config
 from twtxt_registry_client import RegistryClient
 
 
@@ -19,11 +20,30 @@ def cli(ctx, registry_url, insecure):
 
 
 @cli.command()
-@click.argument('nickname', required=True)
-@click.argument('url', required=True)
+@click.option(
+    '-n', '--nickname',
+    help='Nickname to register with. '
+         'Defaults to the configured twtxt nickname, if available.',
+)
+@click.option(
+    '-u', '--url',
+    help='URL to the twtxt file to register with. '
+         'Defaults to the configured twtxt URL, if available.',
+)
 @click.pass_context
 def register(ctx, nickname, url):
-    # TODO: Use twtxt's config to guess the user's info
+    if not nickname or not url:
+        try:
+            config = Config.discover()
+        except ValueError as e:
+            raise click.UsageError(
+                'Nickname or URL were omitted from the command-line, but they'
+                'could not be deduced from the twtxt config: {!s}'.format(e),
+                ctx=ctx,
+            )
+        nickname = nickname or config.nick
+        url = url or config.twturl
+
     click.echo(ctx.obj.register(nickname, url).text)
 
 
