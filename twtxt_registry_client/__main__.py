@@ -1,23 +1,31 @@
 #!/usr/bin/env python3
 from urllib.parse import urlsplit, urlunsplit
-import click
+from objtools.collections import Namespace
 from twtxt.config import Config
-from twtxt_registry_client import RegistryClient
+from twtxt_registry_client import RegistryClient, output
+import click
 
 
 @click.group(name='twtxt-registry')
 @click.argument('registry_url', required=True)
 @click.version_option()
 @click.option('-k', '--insecure', is_flag=True)
+@click.option('-f', '--format',
+              type=click.Choice(output.registry.keys()),
+              default='raw')
 @click.pass_context
-def cli(ctx, registry_url, insecure):
+def cli(ctx, registry_url, insecure, format):
+    ctx.obj = Namespace()
+
     scheme, netloc, path, query, fragment = urlsplit(registry_url)
     if not scheme:
         scheme = 'https'
     if not netloc and path:
         netloc, _, path = path.partition('/')
     registry_url = urlunsplit((scheme, netloc, path, query, fragment))
-    ctx.obj = RegistryClient(registry_url, insecure=insecure)
+    ctx.obj.client = RegistryClient(registry_url, insecure=insecure)
+
+    ctx.obj.formatter = output.registry[format]()
 
 
 @cli.command()
@@ -45,21 +53,27 @@ def register(ctx, nickname, url):
         nickname = nickname or config.nick
         url = url or config.twturl
 
-    click.echo(ctx.obj.register(nickname, url).text)
+    click.echo(ctx.obj.formatter.format_response(
+            ctx.obj.client.register(nickname, url)
+    ))
 
 
 @cli.command()
 @click.option('-q', '--query')
 @click.pass_context
 def users(ctx, query):
-    click.echo(ctx.obj.list_users(q=query).text)
+    click.echo(ctx.obj.formatter.format_users(
+        ctx.obj.client.list_users(q=query)
+    ))
 
 
 @cli.command()
 @click.option('-q', '--query')
 @click.pass_context
 def tweets(ctx, query):
-    click.echo(ctx.obj.list_tweets(q=query).text)
+    click.echo(ctx.obj.formatter.format_tweets(
+        ctx.obj.client.list_tweets(q=query)
+    ))
 
 
 @cli.command()
@@ -89,14 +103,18 @@ def mentions(ctx, name_or_url):
             )
         url = config.twturl
 
-    click.echo(ctx.obj.list_mentions(url).text)
+    click.echo(ctx.obj.formatter.format_tweets(
+        ctx.obj.client.list_mentions(url)
+    ))
 
 
 @cli.command()
 @click.argument('name', required=True)
 @click.pass_context
 def tag(ctx, name):
-    click.echo(ctx.obj.list_tag_tweets(name).text)
+    click.echo(ctx.obj.formatter.format_tweets(
+        ctx.obj.client.list_tag_tweets(name)
+    ))
 
 
 if __name__ == '__main__':

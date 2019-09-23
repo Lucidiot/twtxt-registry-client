@@ -30,7 +30,7 @@ setup(
         'dev': dev_requirements,
     },
     license='GNU General Public License 3',
-    description="API client",
+    description="API client for twtxt registries",
     long_description=open('README.rst').read(),
     long_description_content_type='text/x-rst',
     keywords="twtxt twitter registry twtxt-registry client",
