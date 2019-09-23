@@ -75,6 +75,6 @@ class RegistryClient(object):
 
     def list_tag_tweets(self, name, *, format='plain'):
         return self.get(
-            'tags/{}'.format(urllib.quote(name)),
+            'tags/{}'.format(urllib.parse.quote(name)),
             format=format,
         )
