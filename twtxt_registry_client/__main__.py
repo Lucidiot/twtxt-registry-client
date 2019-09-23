@@ -8,7 +8,7 @@ import click
 
 @click.group(name='twtxt-registry')
 @click.argument('registry_url', required=True)
-@click.version_option()
+@click.version_option('-V', '--version')
 @click.option('-k', '--insecure', is_flag=True)
 @click.option('-f', '--format',
               type=click.Choice(output.registry.keys()),
