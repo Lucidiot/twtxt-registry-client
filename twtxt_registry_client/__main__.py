@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from urllib.parse import urlsplit, urlunsplit
 from objtools.collections import Namespace
+from requests.exceptions import HTTPError
 from twtxt.config import Config
 from twtxt_registry_client import RegistryClient, output
 import click
@@ -54,7 +55,7 @@ def register(ctx, nickname, url):
         url = url or config.twturl
 
     click.echo(ctx.obj.formatter.format_response(
-            ctx.obj.client.register(nickname, url)
+        ctx.obj.client.register(nickname, url, raise_exc=False)
     ))
 
 
@@ -62,18 +63,24 @@ def register(ctx, nickname, url):
 @click.option('-q', '--query')
 @click.pass_context
 def users(ctx, query):
+    try:
     click.echo(ctx.obj.formatter.format_users(
         ctx.obj.client.list_users(q=query)
     ))
+    except HTTPError as e:
+        click.echo(ctx.obj.formatter.format_response(e.response))
 
 
 @cli.command()
 @click.option('-q', '--query')
 @click.pass_context
 def tweets(ctx, query):
+    try:
     click.echo(ctx.obj.formatter.format_tweets(
         ctx.obj.client.list_tweets(q=query)
     ))
+    except HTTPError as e:
+        click.echo(ctx.obj.formatter.format_response(e.response))
 
 
 @cli.command()
@@ -103,18 +110,24 @@ def mentions(ctx, name_or_url):
             )
         url = config.twturl
 
+    try:
     click.echo(ctx.obj.formatter.format_tweets(
         ctx.obj.client.list_mentions(url)
     ))
+    except HTTPError as e:
+        click.echo(ctx.obj.formatter.format_response(e.response))
 
 
 @cli.command()
 @click.argument('name', required=True)
 @click.pass_context
 def tag(ctx, name):
+    try:
     click.echo(ctx.obj.formatter.format_tweets(
         ctx.obj.client.list_tag_tweets(name)
     ))
+    except HTTPError as e:
+        click.echo(ctx.obj.formatter.format_response(e.response))
 
 
 if __name__ == '__main__':
