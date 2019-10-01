@@ -13,10 +13,15 @@ import click
 @click.option('-k', '--insecure', is_flag=True)
 @click.option('-f', '--format',
               type=click.Choice(output.registry.keys()),
-              default='raw')
+              default='pretty')
 @click.pass_context
 def cli(ctx, registry_url, insecure, format):
     ctx.obj = Namespace()
+
+    try:
+        ctx.obj.conf = Config.discover()
+    except ValueError:
+        ctx.obj.conf = Namespace()
 
     scheme, netloc, path, query, fragment = urlsplit(registry_url)
     if not scheme:
@@ -64,9 +69,9 @@ def register(ctx, nickname, url):
 @click.pass_context
 def users(ctx, query):
     try:
-    click.echo(ctx.obj.formatter.format_users(
-        ctx.obj.client.list_users(q=query)
-    ))
+        click.echo(ctx.obj.formatter.format_users(
+            ctx.obj.client.list_users(q=query)
+        ))
     except HTTPError as e:
         click.echo(ctx.obj.formatter.format_response(e.response))
 
@@ -76,9 +81,9 @@ def users(ctx, query):
 @click.pass_context
 def tweets(ctx, query):
     try:
-    click.echo(ctx.obj.formatter.format_tweets(
-        ctx.obj.client.list_tweets(q=query)
-    ))
+        click.echo(ctx.obj.formatter.format_tweets(
+            ctx.obj.client.list_tweets(q=query)
+        ))
     except HTTPError as e:
         click.echo(ctx.obj.formatter.format_response(e.response))
 
@@ -111,9 +116,9 @@ def mentions(ctx, name_or_url):
         url = config.twturl
 
     try:
-    click.echo(ctx.obj.formatter.format_tweets(
-        ctx.obj.client.list_mentions(url)
-    ))
+        click.echo(ctx.obj.formatter.format_tweets(
+            ctx.obj.client.list_mentions(url)
+        ))
     except HTTPError as e:
         click.echo(ctx.obj.formatter.format_response(e.response))
 
@@ -123,9 +128,9 @@ def mentions(ctx, name_or_url):
 @click.pass_context
 def tag(ctx, name):
     try:
-    click.echo(ctx.obj.formatter.format_tweets(
-        ctx.obj.client.list_tag_tweets(name)
-    ))
+        click.echo(ctx.obj.formatter.format_tweets(
+            ctx.obj.client.list_tag_tweets(name)
+        ))
     except HTTPError as e:
         click.echo(ctx.obj.formatter.format_response(e.response))
 

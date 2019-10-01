@@ -1,6 +1,6 @@
 import urllib
+import click
 import requests
-from twtxt.config import Config
 
 
 class RegistryClient(object):
@@ -12,12 +12,8 @@ class RegistryClient(object):
 
         from twtxt_registry_client import __version__
         if disclose_identity or disclose_identity is None:
-            try:
-                config = Config.discover()
-            except ValueError:
-                disclose_identity = False
-            else:
-                disclose_identity = config.disclose_identity
+            config = click.get_current_context().obj.conf
+            disclose_identity = config.get('disclose_identity', False)
 
         if disclose_identity:
             user_agent = 'twtxt-registry/{} (+{}; @{})'.format(
