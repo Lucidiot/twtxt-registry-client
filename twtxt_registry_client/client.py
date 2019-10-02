@@ -4,8 +4,20 @@ import requests
 
 
 class RegistryClient(object):
+    """
+    The twtxt registry API client.
+    """
 
     def __init__(self, registry_url, insecure=False, disclose_identity=None):
+        """
+        :param str registry_url: Base URL for the registry API.
+        :param bool insecure: Disable SSL certificate checks
+        :param disclose_identity:
+           Enable or disable identity disclosure;
+           this appends the User-Agent header with the twtxt local
+           username and URL, deduced from the twtxt configuration
+        :type disclose_identity: bool or None
+        """
         self.registry_url = registry_url
         self.session = requests.Session()
         self.session.verify = not insecure
@@ -27,6 +39,28 @@ class RegistryClient(object):
 
     def request(self, method, endpoint,
                 *, format='plain', raise_exc=True, **params):
+        """
+        Perform an API request.
+
+        :param Callable method: A ``requests`` request method.
+        :param str endpoint:
+           An endpoint path;
+           will be appended to the registry URL and the format.
+        :param str format:
+           The response format, as defined in
+           the twtxt registry API specification.
+        :param bool raise_exc:
+           Raise :exc:`requests.exceptions.HTTPError`
+           for HTTP errors.
+        :param \\**params: Query parameters to send in the request URL.
+        :returns: An HTTP response.
+        :rtype: requests.Response
+        :raises requests.RequestException:
+           For any error occuring when performing the request.
+        :raises requests.HTTPError:
+           When ``raise_exc`` is ``True`` and the response has
+           an HTTP 4xx or 5xx status code.
+        """
         resp = method(
             '/'.join([self.registry_url, format, endpoint]),
             # Ignore parameters with None values
@@ -37,22 +71,98 @@ class RegistryClient(object):
         return resp
 
     def get(self, *args, **kwargs):
+        """
+        Perform a GET request.
+        Passes all arguments to :meth:`RegistryClient.request`.
+
+        :returns: An HTTP response.
+        :rtype: requests.Response
+        :raises requests.RequestException:
+           For any error occuring when performing the request.
+        """
         return self.request(self.session.get, *args, **kwargs)
 
     def post(self, *args, **kwargs):
+        """
+        Perform a POST request.
+        Passes all arguments to :meth:`RegistryClient.request`.
+
+        :returns: An HTTP response.
+        :rtype: requests.Response
+        :raises requests.RequestException:
+           For any error occuring when performing the request.
+        """
         return self.request(self.session.post, *args, **kwargs)
 
     def register(self, nickname, url, **kwargs):
+        """
+        Register a new user.
+
+        :param str nickname: Nickname of the user.
+        :param str url: Profile URL of the user.
+        :param \\**kwargs:
+           Keyword arguments sent to :meth:`RegistryClient.request`.
+        :returns: An HTTP response.
+        :rtype: requests.Response
+        :raises requests.RequestException:
+           For any error occuring when performing the request.
+        """
         return self.post('users', nickname=nickname, url=url, **kwargs)
 
     def list_users(self, *, q=None, **kwargs):
+        """
+        List registered users.
+
+        :param q: Optional query to filter users.
+        :type q: str or None
+        :param \\**kwargs:
+           Keyword arguments sent to :meth:`RegistryClient.request`.
+        :returns: An HTTP response.
+        :rtype: requests.Response
+        :raises requests.RequestException:
+           For any error occuring when performing the request.
+        """
         return self.get('users', q=q, **kwargs)
 
     def list_tweets(self, *, q=None, **kwargs):
+        """
+        List tweets from registered users.
+
+        :param q: Optional query to filter tweets.
+        :type q: str or None
+        :param \\**kwargs:
+           Keyword arguments sent to :meth:`RegistryClient.request`.
+        :returns: An HTTP response.
+        :rtype: requests.Response
+        :raises requests.RequestException:
+           For any error occuring when performing the request.
+        """
         return self.get('tweets', q=q, **kwargs)
 
     def list_mentions(self, url, **kwargs):
+        """
+        List tweets mentioning a given user.
+
+        :param str url: Profile URL of the user to list mentions of.
+        :param \\**kwargs:
+           Keyword arguments sent to :meth:`RegistryClient.request`.
+        :returns: An HTTP response.
+        :rtype: requests.Response
+        :raises requests.RequestException:
+           For any error occuring when performing the request.
+        """
         return self.get('mentions', url=url, **kwargs)
 
     def list_tag_tweets(self, name, **kwargs):
+        """
+        List tweets with a given tag.
+
+        :param str name: Name of the tag to look for.
+        :param \\**kwargs:
+           Keyword arguments sent to :meth:`RegistryClient.request`.
+        :returns: An HTTP response.
+        :rtype: requests.Response
+        :raises requests.RequestException:
+           For any error occuring when performing the request.
+        """
         return self.get('tags/{}'.format(urllib.parse.quote(name)), **kwargs)

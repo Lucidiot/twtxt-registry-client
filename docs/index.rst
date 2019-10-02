@@ -204,6 +204,7 @@ Learn more
 ----------
 
 .. toctree::
+   client
    output
    contributing
 
