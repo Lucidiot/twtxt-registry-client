@@ -5,6 +5,9 @@ from requests.exceptions import HTTPError
 from twtxt.config import Config
 from twtxt_registry_client import RegistryClient, output
 import click
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @click.group(name='twtxt-registry')
@@ -21,19 +24,31 @@ import click
     default='pretty',
     help='Change the output format.',
 )
+@click.option(
+    '-v', '--verbose',
+    is_flag=True,
+    help='Output logs to stderr for debugging purposes.',
+)
 @click.pass_context
-def cli(ctx, registry_url, insecure, format):
+def cli(ctx, registry_url, insecure, format, verbose):
     """
     Command-line client for the twtxt registry API.
 
     Takes a mandatory registry URL argument, as the base API URL
     (ex. https://registry.twtxt.org/api)
     """
+    if verbose:
+        logging.basicConfig(
+            format='%(asctime)s [%(levelname)s/%(name)s] %(message)s',
+            level=logging.DEBUG,
+        )
+
     ctx.obj = Namespace()
 
     try:
         ctx.obj.conf = Config.discover()
-    except ValueError:
+    except ValueError as e:
+        logger.debug('Could not load the twtxt configuration: {!s}'.format(e))
         ctx.obj.conf = Namespace()
 
     scheme, netloc, path, query, fragment = urlsplit(registry_url)
@@ -42,9 +57,14 @@ def cli(ctx, registry_url, insecure, format):
     if not netloc and path:
         netloc, _, path = path.partition('/')
     registry_url = urlunsplit((scheme, netloc, path, query, fragment))
+
+    logger.debug('Using registry URL {}'.format(registry_url))
+    if insecure:
+        logger.debug('SSL certificate checks are disabled')
     ctx.obj.client = RegistryClient(registry_url, insecure=insecure)
 
     ctx.obj.formatter = output.registry[format]()
+    logger.debug('Using formatter {!r}'.format(ctx.obj.formatter))
 
 
 @cli.command()
@@ -66,14 +86,19 @@ def register(ctx, nickname, url):
     Register a user on a registry.
     """
     if not nickname or not url:
+        logger.debug(
+            'Nickname or URL were omitted; trying to deduce from '
+            'the twtxt configuration'
+        )
         if not ctx.obj.conf:
             raise click.UsageError(
-                'Nickname or URL were omitted from the command-line, but they'
+                'Nickname or URL were omitted from the command-line, but they '
                 'could not be deduced from the twtxt config.',
                 ctx=ctx,
             )
         nickname = nickname or ctx.obj.conf.nick
         url = url or ctx.obj.conf.twturl
+        logger.debug('Using nick {!r} and URL {!r}'.format(nickname, url))
 
     click.echo(ctx.obj.formatter.format_response(
         ctx.obj.client.register(nickname, url, raise_exc=False)
@@ -127,20 +152,36 @@ def mentions(ctx, name_or_url):
     mentions.
     """
     if name_or_url:
+        logger.debug('Parsing the name/URL argument')
         scheme = urlsplit(name_or_url).scheme
         if ctx.obj.conf and not scheme:  # it could be a nick
+            logger.debug(
+                'Argument could be a nickname; '
+                'trying to deduce from the twtxt configuration'
+            )
             source = ctx.obj.conf.get_source_by_nick(name_or_url)
             if source:
+                logger.debug('Found source {!r} with URL {!r}'.format(
+                    source.nick, source.url))
                 url = source.url
+            else:
+                logger.debug(
+                    'No source found from twtxt configuration; '
+                    'assuming argument is a URL'
+                )
         url = url or name_or_url  # Fallback
-    elif not ctx.obj.conf:
-        raise click.UsageError(
-            'URL was omitted from the command-line, but it could not '
-            'be deduced from the twtxt config.',
-            ctx=ctx,
-        )
     else:
+        logger.debug(
+            'URL was omitted; trying to deduce from the twtxt configuration')
+        if not ctx.obj.conf:
+            raise click.UsageError(
+                'URL was omitted from the command-line, but it could not '
+                'be deduced from the twtxt config.',
+                ctx=ctx,
+            )
         url = ctx.obj.conf.twturl
+
+    logger.debug('Using URL {}'.format(url))
 
     try:
         click.echo(ctx.obj.formatter.format_tweets(

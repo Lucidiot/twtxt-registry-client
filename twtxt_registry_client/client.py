@@ -1,6 +1,9 @@
+import logging
 import urllib
 import click
 import requests
+
+logger = logging.getLogger(__name__)
 
 
 class RegistryClient(object):
@@ -24,17 +27,23 @@ class RegistryClient(object):
 
         from twtxt_registry_client import __version__
         if disclose_identity or disclose_identity is None:
+            logger.debug('Looking up identity disclosure configuration')
             config = click.get_current_context().obj.conf
             disclose_identity = config.get('disclose_identity', False)
 
         if disclose_identity:
+            logger.debug('disclose_identity is enabled')
             user_agent = 'twtxt-registry/{} (+{}; @{})'.format(
                 __version__,
                 config.twturl,
                 config.nick,
             )
         else:
+            logger.debug(
+                'Configuration not found or disclose_identity is disabled')
             user_agent = 'twtxt-registry/{}'.format(__version__)
+
+        logger.debug('Using user agent {!r}'.format(user_agent))
         self.session.headers['User-Agent'] = user_agent
 
     def request(self, method, endpoint,
@@ -61,11 +70,15 @@ class RegistryClient(object):
            When ``raise_exc`` is ``True`` and the response has
            an HTTP 4xx or 5xx status code.
         """
+        # Ignore parameters with None values
+        params = {k: v for k, v in params.items() if v}
         resp = method(
             '/'.join([self.registry_url, format, endpoint]),
-            # Ignore parameters with None values
-            params={k: v for k, v in params.items() if v},
+            params=params,
         )
+        logger.debug('{} request to {}'.format(resp.request.method, resp.url))
+        logger.debug('HTTP {} {}'.format(resp.status_code, resp.reason))
+        logger.debug('Response body: {!r}'.format(resp.text))
         if raise_exc:
             resp.raise_for_status()
         return resp

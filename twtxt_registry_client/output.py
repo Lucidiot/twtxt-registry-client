@@ -5,8 +5,11 @@ from twtxt.mentions import format_mentions
 from twtxt.parser import parse_iso8601
 import click
 import json
+import logging
 import humanize
 import textwrap
+
+logger = logging.getLogger(__name__)
 
 
 class FormatterRegistry(ClassRegistry):
@@ -285,9 +288,15 @@ class PrettyFormatter(Formatter, key='pretty'):
             return self.format_response(resp)
 
         # Try to determine the configured character limit and time display
+        logger.debug(
+            'Trying to load pretty printing options from twtxt configuration')
         conf = click.get_current_context().obj.conf
         abs_time = conf.get('use_abs_time', False)
         limit = conf.get('character_limit')
+        logger.debug(
+            'Using {} time'.format('absolute' if abs_time else 'relative'))
+        logger.debug('Character limit: {!r}'.format(limit))
+
         # Prevent AttributeErrors when using twtxt.helper.format_mentions
         conf.setdefault('twturl', None)
         conf.setdefault('following', [])

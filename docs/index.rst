@@ -50,17 +50,18 @@ Base arguments
 .. code::
 
    $ twtxt-registry
-     [--version]
-     [--help]
+     [-V|--version]
+     [-h|--help]
      [-k|-insecure]
      [-f [raw|json|pretty]]
+     [-v|--verbose]
      REGISTRY_URL
      COMMAND
      [subcommand args]
 
-``--version``
+``-V`` / ``--version``
    Output the CLI's version number and exit.
-``--help``
+``-h`` / ``--help``
    Output the main help text and exit.
 ``-k`` / ``--insecure``
    Disable SSL certificate checks; first added for the `twtxt demo registry`_
@@ -68,6 +69,8 @@ Base arguments
 ``-f`` / ``--format`` with one of ``raw``, ``json`` or ``pretty``
    Use a specific :class:`Formatter <twtxt_registry_client.output.Formatter>`
    class to output the HTTP responses.
+``-v`` / ``--verbose``
+   Enable debug logging to ``stderr``.
 ``REGISTRY_URL``
    Base URL to a twtxt registry's API.
 
@@ -88,11 +91,11 @@ Registration
    $ twtxt-registry
      [...base arguments...]
      register
-     [--help]
+     [-h|--help]
      [-n|--nickname [NICK]]
      [-u|--url [URL]]
 
-``--help``
+``-h`` / ``--help``
    Output the subcommand help text and exit.
 ``-n [NICK]`` / ``--nickname [NICK]``
    Set a custom nickname. If omitted, the CLI will try to read it from the
@@ -115,10 +118,10 @@ List users
    $ twtxt-registry
      [...base arguments...]
      users
-     [--help]
+     [-h|--help]
      [-q|--query [TEXT]]
 
-``--help``
+``-h`` / ``--help``
    Output the subcommand help text and exit.
 ``-q [TEXT]`` / ``--query [TEXT]``
    Optionally filter users by a query.
@@ -137,10 +140,10 @@ List tweets
    $ twtxt-registry
      [...base arguments...]
      tweets
-     [--help]
+     [-h|--help]
      [-q|--query [TEXT]]
 
-``--help``
+``-h`` / ``--help``
    Output the subcommand help text and exit.
 ``-q [TEXT]`` / ``--query [TEXT]``
    Optionally filter tweets by a query.
@@ -159,10 +162,10 @@ List tweets by mention
    $ twtxt-registry
      [...base arguments...]
      mentions
-     [--help]
+     [-h|--help]
      [NAME_OR_URL]
 
-``--help``
+``-h`` / ``--help``
    Output the subcommand help text and exit.
 ``NAME_OR_URL``
    Name or URL of a user to list mentions to.
@@ -186,10 +189,10 @@ List tweets by tag
    $ twtxt-registry
      [...base arguments...]
      tag
-     [--help]
+     [-h|--help]
      NAME
 
-``--help``
+``-h`` / ``--help``
    Output the subcommand help text and exit.
 ``NAME``
    Tag to list tweets for.
