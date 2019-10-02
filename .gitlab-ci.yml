@@ -22,11 +22,16 @@ flake8:
   script:
     - flake8
 
+doc8:
+  stage: test
+  script:
+    - doc8
+
 deploy-pypi:
   stage: deploy
   when: manual
   only:
-    - master@Lucidiot/twtxt-registry-client
+    - tags@Lucidiot/twtxt-registry-client
   environment:
     name: pypi
     url: https://pypi.org/project/twtxt-registry-client
@@ -47,7 +52,7 @@ deploy-testpypi:
   stage: deploy
   when: manual
   only:
-    - branches@Lucidiot/twtxt-registry-client
+    - tags@Lucidiot/twtxt-registry-client
   environment:
     name: testpypi
     url: https://test.pypi.org/project/twtxt-registry-client
@@ -63,3 +68,17 @@ deploy-testpypi:
     - echo "password=$PYPI_DEPLOY_PASSWORD" >> ~/.pypirc
     - python setup.py sdist bdist_wheel
     - twine upload dist/* -r testpypi
+
+pages:
+  stage: deploy
+  when: manual
+  only:
+    - master@Lucidiot/twtxt-registry-client
+  artifacts:
+    paths:
+      - public
+
+  script:
+    - cd docs
+    - make html
+    - mv _build/html ../public

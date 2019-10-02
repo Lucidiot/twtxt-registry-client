@@ -2,19 +2,8 @@ twtxt-registry-client
 =====================
 
 A simple API client for servers implementing `twtxt`_'s `registry`_ API.
+`Browse documentation`_
 
 .. _twtxt: https://github.com/buckket/twtxt
 .. _registry: https://twtxt.readthedocs.io/en/stable/user/registry.html
-
-To-do
------
-
-* Error handling
-* Command-line help
-* Sphinx documentation
-
-  * Doc8 linting
-  * GitLab Pages
-
-* Parsing, enhanced outputs and porcelain mode, just like with `twtxt`_
-* Verbose output and logging
+.. _Browse documentation: https://lucidiot.gitlab.io/twtxt-registry-client

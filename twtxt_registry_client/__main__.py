@@ -52,11 +52,13 @@ def cli(ctx, registry_url, insecure, format):
     '-n', '--nickname',
     help='Nickname to register with. '
          'Defaults to the configured twtxt nickname, if available.',
+    metavar='[NICK]',
 )
 @click.option(
     '-u', '--url',
     help='URL to the twtxt file to register with. '
          'Defaults to the configured twtxt URL, if available.',
+    metavar='[URL]',
 )
 @click.pass_context
 def register(ctx, nickname, url):
