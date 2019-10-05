@@ -2,6 +2,7 @@
 from urllib.parse import urlsplit, urlunsplit
 from objtools.collections import Namespace
 from requests.exceptions import HTTPError
+from typing import Optional
 from twtxt.config import Config
 from twtxt_registry_client import RegistryClient, output
 import click
@@ -30,7 +31,11 @@ logger = logging.getLogger(__name__)
     help='Output logs to stderr for debugging purposes.',
 )
 @click.pass_context
-def cli(ctx, registry_url, insecure, format, verbose):
+def cli(ctx: click.Context,
+        registry_url: str,
+        insecure: bool,
+        format: str,
+        verbose: bool) -> None:
     """
     Command-line client for the twtxt registry API.
 
@@ -81,7 +86,9 @@ def cli(ctx, registry_url, insecure, format, verbose):
     metavar='[URL]',
 )
 @click.pass_context
-def register(ctx, nickname, url):
+def register(ctx: click.Context,
+             nickname: Optional[str],
+             url: Optional[str]) -> None:
     """
     Register a user on a registry.
     """
@@ -111,7 +118,7 @@ def register(ctx, nickname, url):
     help='An optional search query to filter users.',
 )
 @click.pass_context
-def users(ctx, query):
+def users(ctx: click.Context, query: Optional[str]) -> None:
     """
     List and search users on a registry.
     """
@@ -129,7 +136,7 @@ def users(ctx, query):
     help='An optional search query to filter tweets.',
 )
 @click.pass_context
-def tweets(ctx, query):
+def tweets(ctx: click.Context, query: Optional[str]) -> None:
     """
     List and search tweets on a registry.
     """
@@ -144,7 +151,7 @@ def tweets(ctx, query):
 @cli.command()
 @click.argument('name_or_url', required=False)
 @click.pass_context
-def mentions(ctx, name_or_url):
+def mentions(ctx: click.Context, name_or_url: Optional[str]) -> None:
     """
     List mentions to someone on a registry.
 
@@ -194,7 +201,7 @@ def mentions(ctx, name_or_url):
 @cli.command()
 @click.argument('name', required=True)
 @click.pass_context
-def tag(ctx, name):
+def tag(ctx: click.Context, name: str) -> None:
     """
     Search for tweets containing a tag.
 

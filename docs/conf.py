@@ -14,7 +14,7 @@ import sys
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 BASE_DIR = Path(__file__).resolve().parent
-sys.path.insert(0, BASE_DIR / '..')
+sys.path.insert(0, str(BASE_DIR / '..'))
 
 
 # -- Project information -----------------------------------------------------

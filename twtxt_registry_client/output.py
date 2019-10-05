@@ -7,6 +7,7 @@ import click
 import json
 import logging
 import humanize
+import requests
 import textwrap
 
 logger = logging.getLogger(__name__)
@@ -21,7 +22,7 @@ class FormatterRegistry(ClassRegistry):
     instanciated :data:`registry` in this module instead.
     """
 
-    def check_value(self, value):
+    def check_value(self, value: type) -> None:
         """
         Ensure that a new formatter class subclasses :class:`Formatter`.
 
@@ -40,7 +41,7 @@ classes.
 """
 
 
-class FormatterMetaclass(registry.metaclass, ABCMeta):
+class FormatterMetaclass(registry.metaclass, ABCMeta):  # type: ignore
     """
     The metaclass which allows auto-registration of each formatter.
     In most cases, you should not have to use this class directly;
@@ -71,7 +72,7 @@ class Formatter(metaclass=FormatterMetaclass, register=False):
     # TODO: Add link to objtools docs here once they are published
 
     @abstractmethod
-    def format_response(self, resp):
+    def format_response(self, resp: requests.Response) -> str:
         """
         Generic output for an HTTP response: generally, this would include
         the HTTP status code and the response body. This is used to output
@@ -86,7 +87,7 @@ class Formatter(metaclass=FormatterMetaclass, register=False):
         """
 
     @abstractmethod
-    def format_tweets(self, resp):
+    def format_tweets(self, resp: requests.Response) -> str:
         """
         Output tweets from a successful HTTP response. The tweets can be
         obtained from ``resp.text`` and parsing of the response text is left
@@ -100,7 +101,7 @@ class Formatter(metaclass=FormatterMetaclass, register=False):
         """
 
     @abstractmethod
-    def format_users(self, resp):
+    def format_users(self, resp: requests.Response) -> str:
         """
         Output users from a successful HTTP response. The users can be obtained
         from ``resp.text`` and parsing of the response text is left to the
@@ -121,13 +122,13 @@ class RawFormatter(Formatter, key='raw'):
     Use ``-f raw`` or ``--format raw`` in the CLI to select it.
     """
 
-    def format_response(self, resp):
+    def format_response(self, resp: requests.Response) -> str:
         return resp.text
 
-    def format_tweets(self, resp):
+    def format_tweets(self, resp: requests.Response) -> str:
         return resp.text
 
-    def format_users(self, resp):
+    def format_users(self, resp: requests.Response) -> str:
         return resp.text
 
 
@@ -138,7 +139,7 @@ class JSONFormatter(Formatter, key='json'):
     Use ``-f json`` or ``--format json`` in the CLI to select it.
     """
 
-    def format_response(self, resp):
+    def format_response(self, resp: requests.Response) -> str:
         """
         Outputs a simple JSON payload for any HTTP response, including its
         HTTP status code, its URL and its body.
@@ -162,7 +163,7 @@ class JSONFormatter(Formatter, key='json'):
             'body': resp.text,
         })
 
-    def format_tweets(self, resp):
+    def format_tweets(self, resp: requests.Response) -> str:
         """
         Outputs a list of JSON objects for an HTTP response holding tweets,
         with the users' nickname and URL, the tweet's timestamp, and its
@@ -196,7 +197,7 @@ class JSONFormatter(Formatter, key='json'):
             })
         return json.dumps(output)
 
-    def format_users(self, resp):
+    def format_users(self, resp: requests.Response) -> str:
         """
         Outputs a list of JSON objects for an HTTP response holding users,
         with their nickname, URL, and last update timestamp. Sample output::
@@ -244,7 +245,7 @@ class PrettyFormatter(Formatter, key='pretty'):
         5: 'magenta',
     }
 
-    def format_response(self, resp):
+    def format_response(self, resp: requests.Response) -> str:
         """
         Outputs an HTTP response in a syntax similar to a true HTTP response,
         with its status code, reason and body:
@@ -273,7 +274,7 @@ class PrettyFormatter(Formatter, key='pretty'):
             body=resp.text,
         )
 
-    def format_tweets(self, resp):
+    def format_tweets(self, resp: requests.Response) -> str:
         """
         Outputs an HTTP response as a list of tweets, in a format similar to
         the output of the original ``twtxt`` CLI.
@@ -333,7 +334,7 @@ class PrettyFormatter(Formatter, key='pretty'):
 
         return '\n\n'.join(output)
 
-    def format_users(self, resp):
+    def format_users(self, resp: requests.Response) -> str:
         """
         Outputs an HTTP response as a list of users, in a format similar to
         the output of the original ``twtxt`` CLI.
