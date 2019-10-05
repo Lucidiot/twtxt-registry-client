@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
+from typing import List
 from setuptools import setup, find_packages
 
 
-def read_requirements(filename):
+def read_requirements(filename: str) -> List[str]:
     return [req.strip() for req in open(filename)]
 
 
