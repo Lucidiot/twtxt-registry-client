@@ -1,5 +1,6 @@
+from typing import Optional, Callable, Any
 import logging
-import urllib
+import urllib.parse
 import click
 import requests
 
@@ -11,7 +12,10 @@ class RegistryClient(object):
     The twtxt registry API client.
     """
 
-    def __init__(self, registry_url, insecure=False, disclose_identity=None):
+    def __init__(self,
+                 registry_url: str,
+                 insecure: bool = False,
+                 disclose_identity: Optional[bool] = None):
         """
         :param str registry_url: Base URL for the registry API.
         :param bool insecure: Disable SSL certificate checks
@@ -46,8 +50,13 @@ class RegistryClient(object):
         logger.debug('Using user agent {!r}'.format(user_agent))
         self.session.headers['User-Agent'] = user_agent
 
-    def request(self, method, endpoint,
-                *, format='plain', raise_exc=True, **params):
+    def request(self,
+                method: Callable,
+                endpoint: str,
+                *,
+                format: str = 'plain',
+                raise_exc: bool = True,
+                **params: Any) -> requests.Response:
         """
         Perform an API request.
 
@@ -83,7 +92,7 @@ class RegistryClient(object):
             resp.raise_for_status()
         return resp
 
-    def get(self, *args, **kwargs):
+    def get(self, *args: Any, **kwargs: Any) -> requests.Response:
         """
         Perform a GET request.
         Passes all arguments to :meth:`RegistryClient.request`.
@@ -95,7 +104,7 @@ class RegistryClient(object):
         """
         return self.request(self.session.get, *args, **kwargs)
 
-    def post(self, *args, **kwargs):
+    def post(self, *args: Any, **kwargs: Any) -> requests.Response:
         """
         Perform a POST request.
         Passes all arguments to :meth:`RegistryClient.request`.
@@ -107,7 +116,10 @@ class RegistryClient(object):
         """
         return self.request(self.session.post, *args, **kwargs)
 
-    def register(self, nickname, url, **kwargs):
+    def register(self,
+                 nickname: str,
+                 url: str,
+                 **kwargs: Any) -> requests.Response:
         """
         Register a new user.
 
@@ -122,7 +134,9 @@ class RegistryClient(object):
         """
         return self.post('users', nickname=nickname, url=url, **kwargs)
 
-    def list_users(self, *, q=None, **kwargs):
+    def list_users(self, *,
+                   q: Optional[str] = None,
+                   **kwargs: Any) -> requests.Response:
         """
         List registered users.
 
@@ -137,7 +151,9 @@ class RegistryClient(object):
         """
         return self.get('users', q=q, **kwargs)
 
-    def list_tweets(self, *, q=None, **kwargs):
+    def list_tweets(self, *,
+                    q: Optional[str] = None,
+                    **kwargs: Any) -> requests.Response:
         """
         List tweets from registered users.
 
@@ -152,7 +168,7 @@ class RegistryClient(object):
         """
         return self.get('tweets', q=q, **kwargs)
 
-    def list_mentions(self, url, **kwargs):
+    def list_mentions(self, url: str, **kwargs: Any) -> requests.Response:
         """
         List tweets mentioning a given user.
 
@@ -166,7 +182,7 @@ class RegistryClient(object):
         """
         return self.get('mentions', url=url, **kwargs)
 
-    def list_tag_tweets(self, name, **kwargs):
+    def list_tag_tweets(self, name: str, **kwargs: Any) -> requests.Response:
         """
         List tweets with a given tag.
 

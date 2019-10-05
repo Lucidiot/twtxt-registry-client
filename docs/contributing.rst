@@ -39,6 +39,16 @@ The source code follows the PEP 8 code style and performs CI checks using the
 ``flake8`` tool. To perform the same checks locally, run ``flake8`` on the root
 directory of this repository.
 
+Static typing
+^^^^^^^^^^^^^
+
+This package makes use of the standard `typing`_ module to include PEP 484
+type annotations. Type checking is done using the ``mypy`` tool and everything
+in this package should be typed; this allows other packages to use *objtools*
+and use static typing themselves or benefit from the enhanced documentations
+or IDE warnings. To run type checking locally, run ``mypy`` on the root
+directory of the repository.
+
 Documentation
 -------------
 
@@ -51,5 +61,6 @@ They are also subject to linting using the ``doc8`` tool.
 .. _submit an issue: https://gitlab.com/Lucidiot/twtxt-registry-client/issues/new
 .. _virtualenvwrapper: https://virtualenvwrapper.readthedocs.io
 .. _GitLab repository: https://gitlab.com/Lucidiot/twtxt-registry-client
+.. _typing: https://docs.python.org/3/library/typing.html
 .. _Sphinx: http://www.sphinx-doc.org/
 .. _reStructuredText: http://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
