@@ -33,7 +33,7 @@ class RegistryClient(object):
         if disclose_identity or disclose_identity is None:
             logger.debug('Looking up identity disclosure configuration')
             config = click.get_current_context().obj.conf
-            disclose_identity = config.get('disclose_identity', False)
+            disclose_identity = config.disclose_identity
 
         if disclose_identity:
             logger.debug('disclose_identity is enabled')
