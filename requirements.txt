@@ -1,5 +1,5 @@
 click>=6.7,<7
-humanize>=0.5.1,<1
+humanize>=0.5.1,<4
 objtools>=0.1.0
 python-dateutil>=2.6.1,<3
 requests>=2.22
